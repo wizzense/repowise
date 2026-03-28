@@ -7,10 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { listDecisions } from "@/lib/api/decisions";
 import type { DecisionRecordResponse } from "@/lib/api/types";
 
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-  active: "default",
-  proposed: "secondary",
-  deprecated: "destructive",
+const STATUS_VARIANT: Record<string, "default" | "fresh" | "stale" | "outdated" | "outline" | "accent"> = {
+  active: "fresh",
+  proposed: "accent",
+  deprecated: "outdated",
   superseded: "outline",
 };
 

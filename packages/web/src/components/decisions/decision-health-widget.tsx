@@ -27,12 +27,10 @@ export function DecisionHealthWidget({ repoId }: DecisionHealthWidgetProps) {
       <StatCard
         label="Proposed"
         value={summary.proposed}
-        variant={summary.proposed > 0 ? "warning" : "default"}
       />
       <StatCard
         label="Stale"
         value={summary.stale}
-        variant={summary.stale > 0 ? "danger" : "default"}
       />
     </div>
   );

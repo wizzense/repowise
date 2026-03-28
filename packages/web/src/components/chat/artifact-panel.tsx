@@ -139,11 +139,11 @@ function ArtifactRenderer({ artifact }: { artifact: Artifact }) {
               <div className="text-[10px] text-[var(--color-text-tertiary)] mt-0.5">
                 {r.page_type as string} · score: {((r.relevance_score as number) ?? 0).toFixed(2)}
               </div>
-              {r.snippet && (
+              {r.snippet ? (
                 <p className="text-xs text-[var(--color-text-secondary)] mt-1 line-clamp-3">
                   {r.snippet as string}
                 </p>
-              )}
+              ) : null}
             </div>
           ))}
           {results.length === 0 && (

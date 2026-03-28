@@ -119,7 +119,7 @@ export function RepoSettingsForm({ repo }: RepoSettingsFormProps) {
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">Excluded Paths</span>
           {patterns.length > 0 && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="accent" className="text-xs">
               {patterns.length} active
             </Badge>
           )}

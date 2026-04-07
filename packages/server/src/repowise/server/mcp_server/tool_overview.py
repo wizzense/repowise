@@ -16,6 +16,7 @@ from repowise.core.persistence.models import (
 from repowise.server.mcp_server import _state
 from repowise.server.mcp_server._helpers import _get_repo
 from repowise.server.mcp_server._server import mcp
+from repowise.server.services.knowledge_map import compute_knowledge_map
 
 
 @mcp.tool()
@@ -117,6 +118,18 @@ async def get_overview(repo: str | None = None) -> dict:
                 "top_churn_modules": top_modules,
             }
 
+        # B. Knowledge map -------------------------------------------------------
+        knowledge_map = await compute_knowledge_map(session, repository.id)
+        # Flatten onboarding_targets to a list of paths (MCP tool backward compat)
+        if knowledge_map and "onboarding_targets" in knowledge_map:
+            knowledge_map = dict(knowledge_map)
+            knowledge_map["onboarding_targets"] = [
+                t["path"] for t in knowledge_map["onboarding_targets"]
+            ]
+            knowledge_map["knowledge_silos"] = [
+                s["file_path"] for s in knowledge_map["knowledge_silos"]
+            ]
+
         return {
             "title": overview_page.title if overview_page else repository.name,
             "content_md": overview_page.content if overview_page else "No overview generated yet.",
@@ -135,4 +148,5 @@ async def get_overview(repo: str | None = None) -> dict:
             ],
             "entry_points": [n.node_id for n in entry_nodes],
             "git_health": git_health,
+            "knowledge_map": knowledge_map,
         }

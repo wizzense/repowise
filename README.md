@@ -92,11 +92,11 @@ Most tools are designed around data entities — one module, one file, one symbo
 |---|---|---|
 | `get_overview()` | Architecture summary, module map, entry points | First call on any unfamiliar codebase |
 | `get_context(targets, include?)` | Docs, ownership, decisions, freshness for any targets — files, modules, or symbols | Before reading or modifying code. Pass all relevant targets in one call. |
-| `get_risk(targets)` | Hotspot scores, dependents, co-change partners, plain-English risk summary | Before modifying files — understand what could break |
+| `get_risk(targets?, changed_files?)` | Hotspot scores, dependents, co-change partners, blast radius, recommended reviewers, test gaps, security signals, 0–10 risk score | Before modifying files — understand what could break |
 | `get_why(query?)` | Three modes: NL search over decisions · path-based decisions for a file · no-arg health dashboard | Before architectural changes — understand existing intent |
 | `search_codebase(query)` | Semantic search over the full wiki. Natural language. | When you don't know where something lives |
 | `get_dependency_path(from, to)` | Connection path between two files, modules, or symbols | When tracing how two things are connected |
-| `get_dead_code()` | Unreachable code sorted by confidence and cleanup impact | Cleanup tasks |
+| `get_dead_code(min_confidence?, include_internals?, include_zombie_packages?)` | Unreachable code sorted by confidence and cleanup impact | Cleanup tasks |
 | `get_architecture_diagram(module?)` | Mermaid diagram for the repo or a specific module | Documentation and presentation |
 
 ### Tool call comparison — a real task
@@ -169,9 +169,13 @@ This is what happens when an AI agent has real codebase intelligence.
 | **Symbols** | Searchable index of every function, class, and method |
 | **Coverage** | Doc freshness per file with one-click regeneration |
 | **Ownership** | Contributor attribution and bus factor risk |
-| **Hotspots** | Ranked high-churn files with commit history |
+| **Hotspots** | Ranked by trend-weighted score (180-day decay) and churn |
 | **Dead Code** | Unused code with confidence scores and bulk actions |
 | **Decisions** | Architectural decisions with staleness monitoring |
+| **Costs** | LLM spend by day, model, or operation, with running session totals |
+| **Blast Radius** | Paste a PR file list, see transitive impact, reviewers, and test gaps |
+| **Knowledge Map** | Top owners, bus-factor silos, and onboarding targets on the dashboard |
+| **System Health** | SQL/vector/graph drift status from the atomic store coordinator |
 
 ---
 
@@ -330,9 +334,18 @@ repowise search "<query>"         # semantic search over the wiki
 repowise status                   # coverage, freshness, dead code summary
 
 # Dead code
-repowise dead-code                # full report
-repowise dead-code --safe-only    # only safe-to-delete findings
-repowise dead-code resolve <id>   # mark resolved / false positive
+repowise dead-code                          # full report
+repowise dead-code --safe-only              # only safe-to-delete findings
+repowise dead-code --min-confidence 0.8     # raise the confidence threshold
+repowise dead-code --include-internals      # include private/underscore symbols
+repowise dead-code --include-zombie-packages  # include unused declared packages
+repowise dead-code resolve <id>             # mark resolved / false positive
+
+# Cost tracking
+repowise costs                    # total LLM spend to date
+repowise costs --by operation     # grouped by operation type
+repowise costs --by model         # grouped by model
+repowise costs --by day           # grouped by day
 
 # Decisions
 repowise decision add             # record a decision (interactive)
@@ -345,7 +358,8 @@ repowise generate-claude-md       # regenerate CLAUDE.md
 
 # Utilities
 repowise export [PATH]            # export wiki as markdown files
-repowise doctor                   # check setup, API keys, connectivity
+repowise doctor                   # check setup, API keys, store drift
+repowise doctor --repair          # check and fix detected store mismatches
 repowise reindex                  # rebuild vector store (no LLM calls)
 ```
 

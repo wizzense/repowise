@@ -98,14 +98,14 @@ repowise init        # builds all four intelligence layers (~25 min first time)
 repowise serve       # starts MCP server + local dashboard
 ```
 
-Add to your Claude Code config (`~/.claude/claude_desktop_config.json`):
+Add to your Claude Code config (optional, `repowise init` already initializes `.mcp.json` under the project root):
 
 ```json
 {
   "mcpServers": {
     "repowise": {
       "command": "repowise",
-      "args": ["mcp", "--path", "/path/to/your/project"]
+      "args": ["mcp", "/path/to/your/project"]
     }
   }
 }
